@@ -1,0 +1,58 @@
+
+# with open(r'C:\Users\Han Junlin\Desktop\design\out_file_name', 'r', encoding='utf-8') as f:
+#     text=f.read()
+#     #print(text)
+#     text1=text.strip(',')
+#     print(text1)
+#     while text1:
+#         with open(r'C:\Users\Han Junlin\Desktop\design\1.csv', 'w', encoding='utf-8') as f1:
+#             f1.write(text1[1]+","+text1[0]+","+text1[2])
+#         with open(r'C:\Users\Han Junlin\Desktop\design\2.csv', 'w', encoding='utf-8') as f2:
+
+#             f2.write(text1[1]+","+text1[1]+","+"chemical")
+
+#         with open(r'C:\Users\Han Junlin\Desktop\design\3.csv', 'w', encoding='utf-8') as f3:
+
+#             f3.write(text1[2]+","+text1[2]+","+"gene")
+
+
+wf_entity1 = open("entity1.csv",'w')
+
+wf_entity1.write("Chemical_ID,Name,Label\n")
+
+wf_entity2 = open("entity2.csv",'w')
+
+wf_entity2.write("Gene_ID,Name,Label\n")
+
+wf_relation = open("relation.csv",'w')
+
+wf_relation.write("START_ID,relation,END_ID\n")
+
+with open(r"C:\Users\Han Junlin\Desktop\design\out_file_name") as rf:
+
+    i=0
+    C_dir = {}
+    G_dir = {}
+    for line in rf:
+    
+        contents = line.strip().split(',')
+        relation = contents[0]
+        entity1 = contents[1]
+        entity2 = contents[2]
+        line1 = "{}_{},{},{}\n"
+        if not C_dir.get(entity1):
+            C_dir[entity1]="C_"+str(i)
+            wf_entity1.write(line1.format("C",i,entity1,"Chemical"))
+        if not G_dir.get(entity2):
+            G_dir[entity2]="G_"+str(i)
+            wf_entity2.write(line1.format("G", i, entity2, "Gene"))
+        i += 1
+
+with open(r"C:\Users\Han Junlin\Desktop\design\out_file_name") as rf:
+    for line in rf:
+        contents = line.strip().split(',')
+        relation = contents[0]
+        entity1 = contents[1]
+        entity2 = contents[2]
+        wf_relation.write("{},{},{}\n".format(C_dir[entity1],relation,G_dir[entity2]))
+
