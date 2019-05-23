@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+#获取三元组代码
+
+import os
+import copy
+import time
+import argparse
+
+#调用stanfordcorenlp
+from stanfordcorenlp import StanfordCoreNLP
+
+nlp = StanfordCoreNLP(r'../stanford-corenlp-full-2018-10-05')
+
+#输入输出文件
+#out_file_name = "output.txt"
+
+in_file_name = "../data2/bioconcepts2pubtator_offsets_coSentence"
+out_file_name1 = "out_file1.txt"
+out_file_name2 = "out_file2.txt"
+out_file_name3 = "out_file3.txt"
+
+in_file=in_file_name
+
+
+#设置全局变量 list3用来存放被标记的单词 并放入函数中对比
+global list3
+#设置全局变量 用来存放每一个sentence
+global sen
+
+global count1
+list3=[]
+count1=0
+#文本处理函数，基本规则为 sentence annotation 前者用来标记句子 后者用来标记信息
+def read_file(in_file):
+    #ount = 0
+    #用来存放一下句子
+    ann_list = []
+
+    #打开文件
+    rf = open(in_file, 'r')
+
+    #测试
+    #print("okokok")
+
+    #测试
+    #print(rf)
+    #with open(rf) as f:
+
+    for line in rf:
+        global list3
+        global sen
+        l = line.replace('\n', '').split('\t')
+        #测试
+        #print(l)
+        #读到空 则为下一句话 并返回句子和被标记词语的数组
+        if l==['']:
+            #print("test....\n")
+            #print(list3)
+            StanfordCoreNLP(sen, list3)
+            list3=[]
+        #读到非空 则为一句话 若为sentence 则为句子 若为annotation则为标记 并去ann [2] 为被标记的词语
+        if l != ['']:
+                #time_start = time.time()
+            if l[0] == 'sentence':
+                sentence = l[1]
+                sen=sentence
+                #count += 1
+                #测试
+                #print(sentence)
+
+            if l[0] == 'annotation':
+                ann = l[1].split('|')
+                #span = (ann[0], ann[1])
+                #entity = (span, ann[2], ann[3], ann[4])
+                #if entity not in ann_list:
+                #    ann_list.append(entity)
+                #print(ann)
+                #print(span)
+                #print(entity)
+                list3.append(ann[2])
+
+
+def StanfordCoreNLP(sentence,list3):
+   
+    #同时写三个文件
+    #f1=open("out_file_name1","a")
+    f2=open("out_file_name5","a")
+    #f3=open("out_file_name3","a")
+
+    #with open("out_file1","w") as f1
+    #with open("out_file2","w") as f2
+    #with open("out_file3","w") as f3
+    
+    #print(list3)
+    dependency_result = nlp.dependency_parse(sentence)
+
+    #print('Dependency paring result:\n{0}'.format(dependency_result))
+    #print(dependency_result)
+    #print(sentence)
+    _root=0
+    _nsubj=0
+    _dobj =0
+    for i in dependency_result:
+        if i[0] == 'ROOT':
+            if _root!=0:
+                continue
+            _root = i[2]-1
+            #print("mark1..."+str(_root))
+        elif i[0] == 'nsubj':
+            if _nsubj!=0:
+                continue
+            _nsubj = i[2]-1
+            #print("mark2..."+str(_nsubj))
+        elif i[0] == 'dobj':
+            if _dobj!=0:
+                continue
+            _dobj = i[2]-1  
+            #print("mark3..."+str(_dobj))
+
+
+    tokens = nlp.word_tokenize(sentence)
+
+    #print("tokens:")
+    #print(tokens)
+    #print("triple_extraction1:" + tokens[_root] + "," + tokens[_nsubj] + "," + tokens[_dobj])
+    #f1.write("\ntriple_extraction1:" + tokens[_root] + "," + tokens[_nsubj] + "," + tokens[_dobj])
+    #f1.flush()
+	#获取三元组
+    global count1
+	
+	#最短依存路径
+	dependence_road = 1
+	
+	#防止越界
+    if (_nsubj+2<len(tokens)) and (_dobj+2<len(tokens)):
+        var1=-1
+        var2=-1
+        if (tokens[_nsubj] in list3):
+            var1=_nsubj
+			
+        if (tokens[_nsubj+1] in list3):
+            var1=_nsubj+dependence_road
+			
+        if (tokens[_nsubj+2] in list3):
+            var1=_nsubj+dependence_road+dependence_road
+ 
+
+        if(tokens[_dobj] in list3):
+            var2=_dobj
+			
+        if(tokens[_dobj+1] in list3):
+            var2=_dobj+dependence_road
+			
+        if(tokens[_dobj+2] in list3):
+            var2=_dobj+dependence_road+dependence_road
+         
+        if(tokens[var1]!=tokens[var2]):
+            if (tokens[var1] in list3) and (tokens[var2] in list3):
+                count1 = count1+1
+                #f2.write("\ntriple_extraction4:"tokens[_root]+","+tokens[var1]+","+tokens[var2])
+                print("\ntriple_extraction4:"+tokens[_root]+","+tokens[var1]+","+tokens[var2])
+                print(count1)
+                f2.flush
+			
+        #获取非有价值三元组
+        #if (tokens[_nsubj] in list3) and (tokens[_dobj] in list3):
+            #count1 = count1+1
+            #print(count1)
+			
+            #print("triple_extraction2:"+tokens[_root]+","+tokens[_nsubj]+","+tokens[_dobj])
+			
+            #f2.write("\ntriple_extraction2:"+tokens[_root]+","+tokens[_nsubj]+","+tokens[_dobj])
+			
+            #f2.flush()
+			
+			
+			
+         #if (tokens[_nsubj] in list3) or (tokens[_dobj] in list3):
+		 
+             #f3.write("\ntriple_extraction3:"+tokens[_root]+","+tokens[_nsubj]+","+tokens[_dobj])
+			 
+             #print("triple_extraction3:"+tokens[_root]+","+tokens[_nsubj]+","+tokens[_dobj])
+			 
+             #f3.flush()
+    
+
+
+
+
+     
+
+if __name__ == '__main__':
+    read_file(in_file)
+
+
