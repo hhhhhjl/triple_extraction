@@ -1,10 +1,21 @@
+#Create neo4j net_flame
+
+
 #author@HanJunlin
 
+
+#2019/5/21
+
+#open file 
+
 # with open(r'C:\Users\Han Junlin\Desktop\design\out_file_name', 'r', encoding='utf-8') as f:
+
 #     text=f.read()
 #     #print(text)
+
 #     text1=text.strip(',')
 #     print(text1)
+
 #     while text1:
 #         with open(r'C:\Users\Han Junlin\Desktop\design\1.csv', 'w', encoding='utf-8') as f1:
 #             f1.write(text1[1]+","+text1[0]+","+text1[2])
@@ -17,18 +28,27 @@
 #             f3.write(text1[2]+","+text1[2]+","+"gene")
 
 
+
+#
+#open three works file.csv
+
+#file_entity1 
 wf_entity1 = open("entity1.csv",'w')
 
 wf_entity1.write("Chemical_ID,Name,Label\n")
 
+#file_entity2
 wf_entity2 = open("entity2.csv",'w')
 
 wf_entity2.write("Gene_ID,Name,Label\n")
 
+#file_relation
 wf_relation = open("relation.csv",'w')
 
+#write result
 wf_relation.write("START_ID,relation,END_ID\n")
 
+#open file
 with open(r"C:\Users\Han Junlin\Desktop\design\out_file_name") as rf:
 
     i=0
@@ -41,6 +61,8 @@ with open(r"C:\Users\Han Junlin\Desktop\design\out_file_name") as rf:
         entity1 = contents[1]
         entity2 = contents[2]
         line1 = "{}_{},{},{}\n"
+
+        #create criterion net_fame
         if not C_dir.get(entity1):
             C_dir[entity1]="C_"+str(i)
             wf_entity1.write(line1.format("C",i,entity1,"Chemical"))
@@ -51,9 +73,9 @@ with open(r"C:\Users\Han Junlin\Desktop\design\out_file_name") as rf:
 
 with open(r"C:\Users\Han Junlin\Desktop\design\out_file_name") as rf:
     for line in rf:
+        #give a number
         contents = line.strip().split(',')
         relation = contents[0]
         entity1 = contents[1]
         entity2 = contents[2]
         wf_relation.write("{},{},{}\n".format(C_dir[entity1],relation,G_dir[entity2]))
-
