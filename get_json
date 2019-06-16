@@ -1,7 +1,10 @@
+#get_json
+
 from __future__ import print_function
 
 class PubTator2Anndoc():
-
+    
+    
     GNORMPLUS_ENTITY_CLASSES = {'Gene': 'e_1', 'FamilyName': 'e_2',
                     'DomainMotif': 'e_3', 'Species': 'e_4'}
     """
